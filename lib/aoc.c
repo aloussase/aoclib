@@ -81,3 +81,81 @@ void aoc_run(Aoc *aoc, InputMode input_mode) {
             break;
     }
 }
+
+// DS
+
+AocIntervalNode* aoc_new_interval_node(AocRange *range) {
+    AocIntervalNode* node = malloc(sizeof(AocIntervalNode));
+    node->range = range;
+    node->max = range->end;
+    node->left = NULL;
+    node->right = NULL;
+    return node;
+}
+
+int aoc_ranges_interval(AocRange r1, AocRange r2) {
+    if (r1.start <= r2.end && r1.end >= r2.start) {
+        return 1;
+    }
+    return 0;
+}
+
+int aoc_ranges_compare(const void *r1, const void *r2) {
+    unsigned long int s1 = ((const AocRange*)r1)->start ;
+    unsigned long int s2 =  ((const AocRange *)r2)->start;
+    if  (s1 < s2) {
+        return -1;
+    }
+     if (s1 > s2) {
+         return 1;
+     }
+     return 0;
+}
+
+AocRange* aoc_interval_tree_search(
+    AocIntervalNode* root,
+    AocRange range) {
+    if (root == NULL) return NULL;
+
+    if (aoc_ranges_interval(*root->range, range)) {
+        return root->range;
+    }
+
+    if (root->left != NULL && root->left->max >= range.start)
+        return aoc_interval_tree_search(root->left, range);
+
+    return aoc_interval_tree_search(root->right, range);
+}
+
+int aoc_interval_tree_is_completely_contained(
+    AocIntervalNode* root,
+    AocRange range) {
+    if (root == NULL) return 0;
+
+    if (range.start >= root->range->start && range.end <= root->range->end)
+        return 1;
+
+    if (root->left != NULL && root->left->max >= range.start)
+        return aoc_interval_tree_is_completely_contained(root->left, range);
+
+    return aoc_interval_tree_is_completely_contained(root->right, range);
+}
+
+AocIntervalNode* aoc_interval_tree_insert(
+    AocIntervalNode*root,
+    AocRange *range) {
+    if (root == NULL)
+        return aoc_new_interval_node(range);
+
+    unsigned long int start = root->range->start;
+
+    if (range->start < start)
+        root->left = aoc_interval_tree_insert(root->left, range);
+    else
+        root->right = aoc_interval_tree_insert(root->right, range);
+
+    if (root->max < range->end)
+        root->max = range->end;
+
+    return root;
+}
