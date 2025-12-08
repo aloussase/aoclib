@@ -1,6 +1,7 @@
 #include <curl/curl.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 #include "aoc.h"
 
 typedef struct {
@@ -158,4 +159,32 @@ AocIntervalNode* aoc_interval_tree_insert(
         root->max = range->end;
 
     return root;
+}
+
+// Parsing
+
+const char *aoc_read_int(const char* s, int *out) {
+    char buffer[21] = {0};
+    int index = 0;
+    while (*s && *s >= '0' && *s <= '9') {
+        buffer[index++] = *s++;
+        if (index >= 21) {
+            fprintf(stderr, "integer too big\n");
+            exit(1);
+        }
+    }
+    *out = atoi(buffer);
+    return s;
+}
+
+const char* aoc_read_line(const char*s, char* out) {
+    char *end = strchr(s, '\n') ;
+    if (end == NULL) return s;
+    while (s != end) {
+        *out++ = *s++;
+    }
+    assert(*s == '\n');
+    *out++ = '\n';
+    *out = '\0';
+    return s + 1;
 }

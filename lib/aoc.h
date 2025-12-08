@@ -40,4 +40,13 @@ AocIntervalNode* aoc_new_interval_node(AocRange *range);
 int aoc_ranges_interval(AocRange r1, AocRange r2);
 int aoc_ranges_compare(const void *r1, const void *r2);
 
+// Parsing
+
+/// Read the next integer and return a pointer to the end in the input string.
+/// To check that no integer was read:
+/// Example: if (aoc_read_int(s, &n) == s)
+const char *aoc_read_int(const char* s, int *out);
+
+const char* aoc_read_line(const char*s, char* out);
+
 #endif //AOCLIB_AOC_H
